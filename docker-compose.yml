@@ -1,0 +1,107 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mailguard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mailguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-mailguard}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Bind only to host loopback so PostgreSQL is not exposed publicly
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mailguard} -d ${POSTGRES_DB:-mailguard}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mailguard-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-mailguard}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mailguard}
+      - APP_URL=${APP_URL:-http://localhost:3000}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+      - HELO_DOMAIN=${HELO_DOMAIN:-mailguard.local}
+      - VERIFICATION_FROM_ADDRESS=${VERIFICATION_FROM_ADDRESS:-verify@mailguard.local}
+      - SMTP_TIMEOUT_MS=${SMTP_TIMEOUT_MS:-10000}
+      - DNS_TIMEOUT_MS=${DNS_TIMEOUT_MS:-5000}
+      - MAX_GLOBAL_CONCURRENCY=${MAX_GLOBAL_CONCURRENCY:-10}
+      - MAX_DOMAIN_CONCURRENCY=${MAX_DOMAIN_CONCURRENCY:-2}
+      - MAX_RETRIES=${MAX_RETRIES:-3}
+      - RETRY_DELAY_MS=${RETRY_DELAY_MS:-5000}
+      - RETRY_BACKOFF_MULTIPLIER=${RETRY_BACKOFF_MULTIPLIER:-2}
+      - CACHE_TTL_HOURS=${CACHE_TTL_HOURS:-24}
+      - DOMAIN_CACHE_TTL_HOURS=${DOMAIN_CACHE_TTL_HOURS:-24}
+      - CONSERVATIVE_MODE=${CONSERVATIVE_MODE:-true}
+      - ALLOW_PRIVATE_IPS=${ALLOW_PRIVATE_IPS:-false}
+    volumes:
+      - mailguard_storage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mailguard-worker
+    restart: unless-stopped
+    command: ["npm", "run", "worker"]
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-mailguard}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mailguard}
+      - APP_URL=${APP_URL:-http://app:3000}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - HELO_DOMAIN=${HELO_DOMAIN:-mailguard.local}
+      - VERIFICATION_FROM_ADDRESS=${VERIFICATION_FROM_ADDRESS:-verify@mailguard.local}
+      - SMTP_TIMEOUT_MS=${SMTP_TIMEOUT_MS:-10000}
+      - DNS_TIMEOUT_MS=${DNS_TIMEOUT_MS:-5000}
+      - MAX_GLOBAL_CONCURRENCY=${MAX_GLOBAL_CONCURRENCY:-10}
+      - MAX_DOMAIN_CONCURRENCY=${MAX_DOMAIN_CONCURRENCY:-2}
+      - CONSERVATIVE_MODE=${CONSERVATIVE_MODE:-true}
+      - ALLOW_PRIVATE_IPS=${ALLOW_PRIVATE_IPS:-false}
+    volumes:
+      - mailguard_storage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  maintenance:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mailguard-maintenance
+    restart: unless-stopped
+    command: ["npm", "run", "maintenance"]
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-mailguard}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mailguard}
+    volumes:
+      - mailguard_storage:/app/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+    driver: local
+  mailguard_storage:
+    driver: local

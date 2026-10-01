@@ -1,0 +1,3 @@
+# MailGuard Production Robots.txt
+User-agent: *
+Disallow: /

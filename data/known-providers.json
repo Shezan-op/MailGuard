@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Google Workspace",
+    "patterns": [
+      "aspmx.l.google.com",
+      "googlemail.com",
+      "google.com"
+    ]
+  },
+  {
+    "name": "Microsoft 365",
+    "patterns": [
+      "mail.protection.outlook.com",
+      "outlook.com",
+      "microsoft.com"
+    ]
+  },
+  {
+    "name": "Yahoo Mail",
+    "patterns": [
+      "yahoodns.net",
+      "yahoo.com"
+    ]
+  },
+  {
+    "name": "Zoho Mail",
+    "patterns": [
+      "zoho.com",
+      "zohomail.com",
+      "zoho.eu",
+      "zoho.in"
+    ]
+  },
+  {
+    "name": "Proton Mail",
+    "patterns": [
+      "protonmail.ch",
+      "proton.me"
+    ]
+  },
+  {
+    "name": "Fastmail",
+    "patterns": [
+      "messagingengine.com",
+      "fastmail.com"
+    ]
+  },
+  {
+    "name": "Proofpoint",
+    "patterns": [
+      "pphosted.com",
+      "proofpoint.com"
+    ]
+  },
+  {
+    "name": "Mimecast",
+    "patterns": [
+      "mimecast.com"
+    ]
+  },
+  {
+    "name": "Barracuda",
+    "patterns": [
+      "barracudanetworks.com",
+      "barracuda.com"
+    ]
+  },
+  {
+    "name": "Amazon SES",
+    "patterns": [
+      "inbound-smtp.*.amazonaws.com",
+      "amazon.com"
+    ]
+  },
+  {
+    "name": "Mailgun",
+    "patterns": [
+      "mailgun.org",
+      "mailgun.com"
+    ]
+  },
+  {
+    "name": "SendGrid",
+    "patterns": [
+      "sendgrid.net"
+    ]
+  },
+  {
+    "name": "Cloudflare Email Routing",
+    "patterns": [
+      "cloudflare.net",
+      "mx.cloudflare.net"
+    ]
+  },
+  {
+    "name": "Apple iCloud",
+    "patterns": [
+      "mail.me.com",
+      "icloud.com"
+    ]
+  },
+  {
+    "name": "Rackspace",
+    "patterns": [
+      "emailsrvr.com"
+    ]
+  },
+  {
+    "name": "OVHcloud",
+    "patterns": [
+      "ovh.net"
+    ]
+  },
+  {
+    "name": "Yandex",
+    "patterns": [
+      "mx.yandex.net",
+      "yandex.ru"
+    ]
+  },
+  {
+    "name": "Namecheap / PrivateEmail",
+    "patterns": [
+      "privateemail.com",
+      "registrar-servers.com"
+    ]
+  }
+]
