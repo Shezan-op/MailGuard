@@ -4,6 +4,14 @@
   "private": true,
   "description": "Private, Self-Hosted Email Verification & Deliverability Intelligence Engine",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shezan-op/MailGuard.git"
+  },
+  "homepage": "https://github.com/Shezan-op/MailGuard#readme",
+  "bugs": {
+    "url": "https://github.com/Shezan-op/MailGuard/issues"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/copy-standalone-assets.js",

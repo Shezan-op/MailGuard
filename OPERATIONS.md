@@ -156,7 +156,16 @@ MailGuard supports zero-downtime secret rotation using the `SESSION_SECRET_FALLB
 4. After 24 hours (session expiration window), remove `SESSION_SECRET_FALLBACK`.
 
 ### 5.2 Changing Admin Password
-Set the `ADMIN_PASSWORD` variable in `.env` to a strong, high-entropy password (min 12 characters). Never deploy to production with the default password.
+MailGuard stores salted SHA-256 password hashes to prevent exposing plaintext credentials:
+1. Generate the salted password hash:
+   ```bash
+   npm run auth:hash "YourNewSecurePasswordHere"
+   ```
+2. Update `.env` with the generated hash:
+   ```bash
+   ADMIN_PASSWORD_HASH="<generated_salted_hash>"
+   ```
+3. Restart the web server for the changes to take effect immediately.
 
 ---
 
